@@ -4,9 +4,10 @@ import dotenv from 'dotenv'
 const app: Express = express()
 const PORT: number = 8000
 
-dotenv.config()
+dotenv.config()//configure env enviroment to use data from .env
 app.use(json())
 app.use(cors())
+app.use(express.json()) //all express muse be convert to json
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World')
