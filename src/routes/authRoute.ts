@@ -8,4 +8,6 @@ authRoute.use(express.json())
 
 authRoute.post('/register', authController.register)
 
+authRoute.get('/verify-email', authController.verifyEmail);
+
 export default authRoute

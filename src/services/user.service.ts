@@ -1,8 +1,9 @@
 import { userType } from '~/models/user'
 import { connectToDataBase } from './database.service'
+import { ObjectId } from 'mongodb'
 import * as mongoDB from 'mongodb'
 
-const userSerive = {
+const userService = {
   getUserCollection: async function (): Promise<mongoDB.Collection> {
     try {
       const db = await connectToDataBase('ecommerce_dev')
@@ -18,7 +19,8 @@ const userSerive = {
       const addedUser = await userCollection.insertOne(user)
       return addedUser
     } catch (error) {
-      throw error
+      console.error('Error adding user:', error)
+      return null
     }
   },
 
@@ -26,16 +28,41 @@ const userSerive = {
   findUserByEmail: async function (email: string): Promise<any> {
     try {
       const userCollection = await this.getUserCollection()
-      const foundUser = await userCollection.findOne({ userEmail: email })
+      const foundUser = await userCollection.findOne({ email: email })
       return foundUser
     } catch (error) {
-      throw error
+      console.error('Error finding user by email:', error)
+      return null
+    }
+  },
+
+  findUserById: async function (id: string): Promise<any> {
+    try {
+      const userCollection = await this.getUserCollection()
+      const foundUser = await userCollection.findOne({ _id: new ObjectId(id) })
+      return foundUser
+    } catch (error) {
+      console.error('Error finding user by ID:', error)
+      return null
+    }
+  },
+
+  updateVerifiedEmailUser: async function (id: string, verifiedEmailToken: string) {
+    try {
+      const userCollection = await this.getUserCollection()
+      const result = await userCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { verifiedEmailToken: verifiedEmailToken } }
+      )
+      
+      return result
+    } catch (error) {
+      console.error(`Error updating user with id ${id}:`, error)
     }
   }
 }
 
-export default userSerive
-
+export default userService
 // export async function getUserCollection(): Promise<mongoDB.Collection> {
 //     try {
 //         const db = await connectToDataBase('userDB');

@@ -1,9 +1,9 @@
 import * as mongoDB from 'mongodb'
 import dotenv from 'dotenv'
 
-dotenv.config()
-
 export async function connectToDataBase(dbName: string): Promise<mongoDB.Db> {
+  dotenv.config()
+
   const client: mongoDB.MongoClient = new mongoDB.MongoClient(`${process.env.ECORMERCE_URL}`)
 
   await client.connect()
