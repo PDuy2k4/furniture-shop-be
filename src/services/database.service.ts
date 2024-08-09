@@ -1,17 +1,17 @@
 import * as mongoDB from 'mongodb'
-import * as dotenv from 'dotenv'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export async function connectToDataBase(dbName: string): Promise<mongoDB.Db> {
-  dotenv.config()
+  const client: mongoDB.MongoClient = new mongoDB.MongoClient(`${process.env.ECORMERCE_URL}`)
 
-  const client: mongoDB.MongoClient = new mongoDB.MongoClient(process.env.MONGODB_URL || "")
+  await client.connect()
 
-  await client.connect();
+  const db: mongoDB.Db = client.db(dbName)
 
-  const db: mongoDB.Db = client.db(dbName);
-  
-  console.log("Connected to MongoDB")
+  console.log('Connected to MongoDB')
 
+  return db
   //we connect to the table and then return the it's connection
-  return db;
 }
