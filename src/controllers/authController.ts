@@ -38,11 +38,12 @@ const authController = {
       // Find user by email
       const user = await userSerive.findUserByEmail(email as string)
 
+      console.log(user.email)
+
       if (user) {
         // Cập nhật giá trị của verifiedEmailToken
         const result = await userSerive.updateVerifiedEmailUser(user._id, 'true')
 
-        
         if (result && result.modifiedCount > 0) {
           res.status(200).json({ message: 'Email verified successfully' })
         } else {

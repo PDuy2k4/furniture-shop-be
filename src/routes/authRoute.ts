@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb'
 import authController from '~/controllers/authController'
 import userSerive from '~/services/user.service'
 
+//CRUD
+
 const authRoute = express.Router()
 authRoute.use(express.json())
 

@@ -11,19 +11,19 @@ export const sendVerificationEmail = async (to: string, name: string) => {
     }
   })
   const mailOptions = {
-    from: `Furniture Shop" ${process.env.USER_EMAIL}`,
+    from: `Furniture Shop`,
     to: to,
-    subject: 'Verify your email',
+    subject: 'VERIFY YOUR ACCOUNT',
     html: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6;">
             <h2 style="color: #333;">Welcome to Furniture Shop!</h2>
-            <p>Dear ${name},</p>
-            <p>Thank you for registering with Furniture Shop. We are delighted to have you with us.</p>
+            <p>Hey <strong>${name}</strong>,</p>
+            <p>Thank you for being a member of our community. We are delighted to welcome your participation.</p>
             <p>Please verify your email address by clicking the link below:</p>
             <p style="text-align: center;">
-              <a href="${process.env.APP_BASE_URL}${process.env.VERIFY_EMAIL_ENDPOINT}?email=${to}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Verify Email</a>
+              <a href="${process.env.APP_BASE_URL}${process.env.VERIFY_EMAIL_ENDPOINT}?email=${to}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; transition: background-color 0.3s ease;">Verify Email</a>
             </p>
-            <p>If you did not register for an account, please ignore this email.</p>
+            <If>Enjoy your moment when shopping at our website. If you have any problem, please contact with us through this email.</p>
             <p>Best regards,</p>
             <p><strong>Furniture Shop Team</strong></p>
           </div>
