@@ -9,23 +9,23 @@ class Validation {
         notEmpty: true,
         errorMessage: 'Name is required',
         isLength: {
-          errorMessage: 'Name should be at least 7 chars long and contain at most 12 chars',
-          options: { min: 7, max: 12 }
+          errorMessage: 'Name should be at least 7 chars long and contain at most 15 chars',
+          options: { min: 7, max: 15 }
         }
       },
-      // email: {
-      //   isEmail: true,
-      //   notEmpty: true,
-      //   errorMessage: 'Email is required',
-      //   custom: {
-      //     options: async (email: string) => {
-      //       const user = await userService.getUserByEmail(email)
-      //       if (user) {
-      //         throw new Error('Email already exists')
-      //       }
-      //     }
-      //   }
-      // },
+      email: {
+        isEmail: true,
+        notEmpty: true,
+        errorMessage: 'Email is required',
+        custom: {
+          options: async (email: string) => {
+            const user = await userService.getUserByEmail(email)
+            if (user) {
+              throw new Error('Email already exists')
+            }
+          }
+        }
+      },
       password: {
         isString: true,
         notEmpty: true,
