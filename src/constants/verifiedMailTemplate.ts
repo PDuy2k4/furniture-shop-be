@@ -22,8 +22,8 @@ export const mailTemplate = (token: string) =>
                       </p>
                       <p style="margin-bottom:16px;margin-top:24px">
                         Keep an eye out for another email from our team with
-                        resources to help you get started with FNShop.
+                        resources to help you get started with UIT_SHOP_NOITHAT.
                       </p>
                       <p style="margin-bottom:16px;margin-top:24px">Cheers,</p>
-                      <p style="margin-bottom:16px">The FNShop Team</p>
+                      <p style="margin-bottom:16px">The UIT_SHOP_NOITHAT Team</p>
                  </div>`

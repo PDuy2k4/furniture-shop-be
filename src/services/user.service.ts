@@ -4,13 +4,20 @@ import { ObjectId } from 'mongodb'
 class UserService {
   async getUserByEmail(email: string) {
     try {
-      const user = await databaseService.user.findOne({ email: email })
+      const user = await databaseService.user.findOne<userType>({ email: email })
       return user
     } catch (err) {
       console.log(err)
     }
   }
-
+  async getUserByID(id: ObjectId) {
+    try {
+      const user = await databaseService.user.findOne<userType>({ _id: id })
+      return user
+    } catch (err) {
+      console.log(err)
+    }
+  }
   async addUser(user: userType) {
     try {
       const newUser = await databaseService.user.insertOne(user)

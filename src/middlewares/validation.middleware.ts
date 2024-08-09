@@ -9,8 +9,8 @@ class Validation {
         notEmpty: true,
         errorMessage: 'Name is required',
         isLength: {
-          errorMessage: 'Name should be at least 7 chars long and contain at most 15 chars',
-          options: { min: 7, max: 15 }
+          errorMessage: 'Name should be at least 7 chars long and contain at most 50 chars',
+          options: { min: 7, max: 50 }
         }
       },
       email: {
