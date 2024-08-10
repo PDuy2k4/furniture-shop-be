@@ -29,6 +29,8 @@ const userService = {
     try {
       const userCollection = await this.getUserCollection()
       const foundUser = await userCollection.findOne({ email: email })
+      console.log('found email');
+      
       return foundUser
     } catch (error) {
       console.error('Error finding user by email:', error)

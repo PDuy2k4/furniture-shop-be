@@ -6,6 +6,7 @@ import { json } from 'stream/consumers'
 import userSchema, { userType } from '~/models/user'
 import userSerive from '~/services/user.service'
 import { sendVerificationEmail } from '~/utils/mailer'
+import { log } from 'console'
 
 const authController = {
   //register
@@ -38,8 +39,6 @@ const authController = {
       // Find user by email
       const user = await userSerive.findUserByEmail(email as string)
 
-      console.log(user.email)
-
       if (user) {
         // Cập nhật giá trị của verifiedEmailToken
         const result = await userSerive.updateVerifiedEmailUser(user._id, 'true')
@@ -53,6 +52,27 @@ const authController = {
         res.status(200).json({ message: 'Email verified successfully' })
       } else {
         res.status(400).json({ message: 'User not found' })
+      }
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+
+  logIn: async (req: Request, res: Response) => {
+    try {
+      const user = await userSerive.findUserByEmail(req.body.email)
+      if (!user) {
+        res.status(500).json('Email or password is wrong')
+      } else {
+        const validPassword = await bcrypt.compare(req.body.password, user.password)
+        if (!validPassword) {
+          res.status(404).json('Email or password is wrong')
+        }
+        if (user && validPassword) {
+          console.log('siuuu')
+          res.status(200).json('Success')
+          log(req.body.email, req.body.password)
+        }
       }
     } catch (error) {
       res.status(500).json(error)
