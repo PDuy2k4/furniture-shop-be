@@ -29,7 +29,6 @@ class UserService {
   async updateUser(id: ObjectId, update: { [key: string]: any }) {
     try {
       const updatedUser = await databaseService.user.updateOne({ _id: id }, { $set: update })
-      console.log('updatedUser', updatedUser)
       return updatedUser
     } catch (err) {
       console.log(err)

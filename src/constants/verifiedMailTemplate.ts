@@ -10,7 +10,7 @@ export const mailTemplate = (token: string) =>
                         below:
                       </p>
                       <div style="line-height:100%">
-  <a href="${process.env.APP_URL as string}/auth/verify-email/${token}" style="text-decoration:none;display:inline-block;border-radius:8px;background-color:#0281f1;padding-left:16px;padding-right:16px;padding-top:14px;padding-bottom:14px;text-align:center;font-weight:600;color:white" target="_blank" >
+  <a href="${process.env.APP_URL as string}/verify-email/${token}" style="text-decoration:none;display:inline-block;border-radius:8px;background-color:#0281f1;padding-left:16px;padding-right:16px;padding-top:14px;padding-bottom:14px;text-align:center;font-weight:600;color:white" target="_blank" >
     <span>Verify Email Address</span>
   </a>
 </div>

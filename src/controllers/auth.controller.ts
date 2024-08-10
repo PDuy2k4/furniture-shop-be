@@ -6,6 +6,7 @@ import { signToken } from '~/utils/signToken'
 import { sendEmail } from '~/utils/mailer'
 import { mailTemplate } from '~/constants/verifiedMailTemplate'
 import { hashPassword } from '~/utils/crypto'
+import { userVerifyStatus } from '~/constants/enum'
 dotenv.config()
 class AuthController {
   async register(req: Request, res: Response) {
@@ -29,11 +30,20 @@ class AuthController {
     try {
       await Promise.all([
         userService.updateUser(req.body._id, { verifiedEmailToken: verifiedEmailToken }),
-        sendEmail(req.body.email, 'Verify your email', mailTemplate(req.body.verifiedEmailToken))
+        sendEmail(req.body.email, 'Verify your email', mailTemplate(verifiedEmailToken))
       ])
       res.status(201).json({ message: 'Please check your email to veriify' })
     } catch (err: any) {
       res.status(400).json({ message: `Please wait 10 minutes and try again` })
+    }
+  }
+  async verifiedEmail(req: Request, res: Response) {
+    const { _id } = req.body
+    try {
+      await userService.updateUser(_id, { verify: userVerifyStatus.Verified, verifiedEmailToken: '' })
+      res.status(201).json({ message: 'Email is verified' })
+    } catch (err: any) {
+      res.status(400).json({ message: err.message })
     }
   }
 }
