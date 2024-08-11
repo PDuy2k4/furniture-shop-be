@@ -138,11 +138,6 @@ class AuthenticationMiddleware {
   }
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     await checkSchema({
-      email: {
-        notEmpty: true,
-        isEmail: true,
-        errorMessage: ValidationErrorMessage.INVALID_EMAIL
-      },
       newPassword: {
         isString: true,
         notEmpty: true,
@@ -180,10 +175,13 @@ class AuthenticationMiddleware {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, token } = req.body;
+    const { token } = req.body;
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const email = decoded.email;
     const user = await AuthenticationServiceInstance.findUserByEmail(email);
     if (user) {
       if (user.forgotPasswordToken === token) {
+        req.body.email = email;
         next();
       } else {
         return res.status(400).json({ message: ResponseMessage.INVALID_CREDENTIALS });
