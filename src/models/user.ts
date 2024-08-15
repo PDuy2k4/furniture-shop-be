@@ -40,7 +40,7 @@ export default class userSchema {
     this.verifiedEmailToken = user.verifiedEmailToken || ''
     this.verify = user.verify || userVerifyStatus.Unverified
     this.refreshToken = user.refreshToken || ''
-    this.createdAt = user.createdAt || ''
-    this.updatedAt = user.updatedAt || ''
+    this.createdAt = user.createdAt || new Date().toISOString()
+    this.updatedAt = user.updatedAt || new Date().toISOString()
   }
 }

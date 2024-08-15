@@ -6,12 +6,22 @@ import { json } from 'stream/consumers'
 import userSchema, { userType } from '~/models/user'
 import userSerive from '~/services/user.service'
 import { sendVerificationEmail } from '~/utils/mailer'
-import { log } from 'console'
+import jwt from 'jsonwebtoken'
+import authValidate from '~/validates/authValidate'
+import { userVerifyStatus } from '~/constants/enum'
 
 const authController = {
   //register
   register: async (req: Request, res: Response) => {
     try {
+      const valid = await authValidate.validateRegister(req, res)
+      console.log(valid)
+
+      if (!valid) {
+        return res
+      }
+
+      console.log(req.body.email + 'in controller')
       const hashedPassword = await bcrypt.hash(req.body.password, 10)
       const newUser = new userSchema({
         ...req.body,
@@ -19,63 +29,81 @@ const authController = {
       })
 
       const addedUser = await userSerive.addUser(newUser)
+      console.log(addedUser)
 
       if (addedUser) {
-        await sendVerificationEmail(newUser.email, newUser.name)
+        const accessToken = jwt.sign(
+          {
+            _id: newUser._id,
+            isAdmin: newUser.isAdmin,
+            email: newUser.email
+          },
+          `${process.env.JWT_ACCESS_KEY}`,
+          { expiresIn: '1h' }
+        )
+        await sendVerificationEmail(newUser.email, newUser.name, accessToken)
+        console.log('Please check your email')
         res.status(201).json({ message: 'Please check your email' })
       } else {
+        console.log('Can not send verification to your email')
         res.status(400).json({ message: 'Can not send verification to your email' })
       }
     } catch (error) {
       //error response
-      res.status(500).json(error)
+      return res.status(500).json({ message: 'Internal server error' })
     }
   },
 
   verifyEmail: async (req: Request, res: Response) => {
     try {
-      const email = req.query.email as string
+      const token = req.query.token as string
+      console.log(token)
 
-      // Find user by email
-      const user = await userSerive.findUserByEmail(email as string)
+      let userVerifyEmail = ''
+      let userVerifyId = ''
 
-      if (user) {
-        // Cập nhật giá trị của verifiedEmailToken
-        const result = await userSerive.updateVerifiedEmailUser(user._id, 'true')
+      if (token) {
+        jwt.verify(token, `${process.env.JWT_ACCESS_KEY}`, (err: any, userToken: any) => {
+          if (err) {
+            res.status(403).json({ message: 'Token is not valid' })
+          } else {
+            userVerifyEmail = userToken.email || ''
+            userVerifyId = userToken._id || ''
 
-        if (result && result.modifiedCount > 0) {
-          res.status(200).json({ message: 'Email verified successfully' })
-        } else {
-          res.status(400).json({ message: 'Failed to verify email' })
-        }
+            console.log(userToken)
 
-        res.status(200).json({ message: 'Email verified successfully' })
+            // Use the verifiedEmail and verifiedID for further processing
+            console.log('Verified Email:', userVerifyEmail)
+          }
+        })
+      }
+      if (userVerifyEmail !== '' && userVerifyId !== '') {
+        console.log('Email verified successfully')
+        userSerive.updateVerifiedEmailUser(userVerifyId, `${token}`, userVerifyStatus.Verified)
+        return res.status(200).json({ message: 'Email verified successfully' })
       } else {
-        res.status(400).json({ message: 'User not found' })
+        return res.status(400).json({ message: 'User not found' })
       }
     } catch (error) {
-      res.status(500).json(error)
+      return res.status(500).json({ message: 'Internal server error' })
     }
   },
 
   logIn: async (req: Request, res: Response) => {
     try {
-      const user = await userSerive.findUserByEmail(req.body.email)
-      if (!user) {
-        res.status(500).json('Email or password is wrong')
-      } else {
-        const validPassword = await bcrypt.compare(req.body.password, user.password)
-        if (!validPassword) {
-          res.status(404).json('Email or password is wrong')
-        }
-        if (user && validPassword) {
-          console.log('siuuu')
-          res.status(200).json('Success')
-          log(req.body.email, req.body.password)
-        }
+      const valid = await authValidate.validateLogin(req, res)
+
+      console.log(valid)
+      if (!valid) {
+        return res
       }
+
+      const user = await userSerive.findUserByEmail(req.body.email)
+
+      const validPassword = await bcrypt.compare(req.body.password, user.password)
+      res.status(200).json('Login success')
     } catch (error) {
-      res.status(500).json(error)
+      return res.status(500).json({ message: 'Internal server error' })
     }
   }
 }

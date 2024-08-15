@@ -9,6 +9,7 @@ const authRoute = express.Router()
 authRoute.use(express.json())
 
 authRoute.post('/register', authController.register)
+
 authRoute.post('/login', authController.logIn)
 
 authRoute.get('/verify-email', authController.verifyEmail);

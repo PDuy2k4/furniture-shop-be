@@ -2,6 +2,9 @@ import { userType } from '~/models/user'
 import { connectToDataBase } from './database.service'
 import { ObjectId } from 'mongodb'
 import * as mongoDB from 'mongodb'
+import { networkInterfaces } from 'os'
+import { Verify, verify } from 'crypto'
+import { userVerifyStatus } from '~/constants/enum'
 
 const userService = {
   getUserCollection: async function (): Promise<mongoDB.Collection> {
@@ -16,6 +19,7 @@ const userService = {
   addUser: async function (user: userType): Promise<any> {
     try {
       const userCollection = await this.getUserCollection()
+      console.log('Connected to addUser')
       const addedUser = await userCollection.insertOne(user)
       return addedUser
     } catch (error) {
@@ -28,10 +32,12 @@ const userService = {
   findUserByEmail: async function (email: string): Promise<any> {
     try {
       const userCollection = await this.getUserCollection()
+      console.log('Connected to findUserByEmail')
       const foundUser = await userCollection.findOne({ email: email })
-      console.log('found email');
-      
-      return foundUser
+      if (foundUser) {
+        console.log('found email')
+        return foundUser
+      } else return null
     } catch (error) {
       console.error('Error finding user by email:', error)
       return null
@@ -41,6 +47,7 @@ const userService = {
   findUserById: async function (id: string): Promise<any> {
     try {
       const userCollection = await this.getUserCollection()
+      console.log('Connected to findUserById')
       const foundUser = await userCollection.findOne({ _id: new ObjectId(id) })
       return foundUser
     } catch (error) {
@@ -49,14 +56,15 @@ const userService = {
     }
   },
 
-  updateVerifiedEmailUser: async function (id: string, verifiedEmailToken: string) {
+  updateVerifiedEmailUser: async function (id: string, verifiedEmailToken: string, verifiStatus: userVerifyStatus) {
     try {
       const userCollection = await this.getUserCollection()
+      console.log('Connected to updateVerifiedEmailUser')
       const result = await userCollection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { verifiedEmailToken: verifiedEmailToken } }
+        { $set: { verifiedEmailToken: verifiedEmailToken, verify: verifiStatus } }
       )
-      
+
       return result
     } catch (error) {
       console.error(`Error updating user with id ${id}:`, error)
