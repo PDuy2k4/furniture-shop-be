@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import nodemailer from 'nodemailer'
-import express, { Request, Response } from 'express'
+import express, { Request, response, Response } from 'express'
 import { ObjectId } from 'mongodb'
 import { json } from 'stream/consumers'
 import userSchema, { userType } from '~/models/user'
@@ -14,11 +14,10 @@ const authController = {
   //register
   register: async (req: Request, res: Response) => {
     try {
-      const valid = await authValidate.validateRegister(req, res)
-      console.log(valid)
+      const validationResult = await authValidate.validateRegister(req, res)
 
-      if (!valid) {
-        return res
+      if (validationResult.status != 200) {
+        return validationResult
       }
 
       console.log(req.body.email + 'in controller')
@@ -43,7 +42,7 @@ const authController = {
         )
         await sendVerificationEmail(newUser.email, newUser.name, accessToken)
         console.log('Please check your email')
-        res.status(201).json({ message: 'Please check your email' })
+        return res.status(201).json({ message: 'Please check your email' })
       } else {
         console.log('Can not send verification to your email')
         res.status(400).json({ message: 'Can not send verification to your email' })
@@ -65,12 +64,10 @@ const authController = {
       if (token) {
         jwt.verify(token, `${process.env.JWT_ACCESS_KEY}`, (err: any, userToken: any) => {
           if (err) {
-            res.status(403).json({ message: 'Token is not valid' })
+            return res.status(403).json({ message: 'Token is not valid' })
           } else {
             userVerifyEmail = userToken.email || ''
             userVerifyId = userToken._id || ''
-
-            console.log(userToken)
 
             // Use the verifiedEmail and verifiedID for further processing
             console.log('Verified Email:', userVerifyEmail)
@@ -91,17 +88,16 @@ const authController = {
 
   logIn: async (req: Request, res: Response) => {
     try {
-      const valid = await authValidate.validateLogin(req, res)
+      const validationResult = await authValidate.validateLogin(req, res)
 
-      console.log(valid)
-      if (!valid) {
-        return res
+      if (validationResult.status != 200) {
+        return validationResult
       }
 
       const user = await userSerive.findUserByEmail(req.body.email)
 
       const validPassword = await bcrypt.compare(req.body.password, user.password)
-      res.status(200).json('Login success')
+      return res.status(200).json('Login success')
     } catch (error) {
       return res.status(500).json({ message: 'Internal server error' })
     }
