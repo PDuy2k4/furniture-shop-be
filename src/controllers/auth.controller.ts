@@ -7,6 +7,7 @@ import { sendEmail } from '~/utils/mailer'
 import { mailTemplate } from '~/constants/verifiedMailTemplate'
 import { hashPassword } from '~/utils/crypto'
 import { userVerifyStatus } from '~/constants/enum'
+
 dotenv.config()
 class AuthController {
   async register(req: Request, res: Response) {
@@ -45,6 +46,54 @@ class AuthController {
     } catch (err: any) {
       res.status(400).json({ message: err.message })
     }
+  }
+  async login(req: Request, res: Response) {
+    const { _id, isAdmin } = req.body
+    const accessToken = signToken({ type: 'accessToken', payload: { _id, isAdmin } })
+    const refreshToken = signToken({ type: 'refreshToken', payload: { _id, isAdmin } })
+    const token = await Promise.all([accessToken, refreshToken])
+    await userService.updateUser(_id, { refreshToken: token[1] })
+    const { password, remember, ...others } = req.body
+    res.cookie('refreshToken', token[1], { httpOnly: true, sameSite: 'strict', secure: true })
+    res.status(200).json({ ...others, accessToken: token[0], refreshToken: token[1] })
+  }
+  async logout(req: Request, res: Response) {
+    await userService.updateUser(req.body._id, { refreshToken: '' })
+    res.clearCookie('refreshToken')
+    res.status(200).json({ message: 'Logout successfully' })
+  }
+  async requestRefreshToken(req: Request, res: Response) {
+    const { user } = req.body
+    const accessToken = signToken({ type: 'accessToken', payload: { _id: user._id, isAdmin: user.isAdmin } })
+    const newRefreshToken = signToken({ type: 'refreshToken', payload: { _id: user._id, isAdmin: user.isAdmin } })
+    await userService.updateUser(user._id, { refreshToken: newRefreshToken })
+    res.cookie('refreshToken', newRefreshToken, { httpOnly: true, sameSite: 'none', secure: true })
+    res.status(200).json({ accessToken, refreshToken: newRefreshToken })
+  }
+  async googleLogin(req: Request, res: Response) {
+    const { existUser } = req.body
+    if (!existUser) {
+      try {
+        const user = req.body.user
+        const newUser = new UserSchema(user)
+        req.body.user = newUser
+        await userService.addUser(newUser)
+      } catch (err: any) {
+        return res.status(400).json({ message: err.message })
+      }
+    }
+    const accessToken = signToken({
+      type: 'accessToken',
+      payload: { _id: req.body.user._id, isAdmin: req.body.user.isAdmin }
+    })
+    const refreshToken = signToken({
+      type: 'refreshToken',
+      payload: { _id: req.body.user._id, isAdmin: req.body.user.isAdmin }
+    })
+    const token = await Promise.all([accessToken, refreshToken])
+    await userService.updateUser(req.body.user._id, { refreshToken: token[1] })
+    res.cookie('refreshToken', token[1], { httpOnly: true, sameSite: 'none', secure: true })
+    res.redirect(`${process.env.APP_URL}/oauth?accessToken=${token[0]}&userId=${req.body.user._id}`)
   }
 }
 

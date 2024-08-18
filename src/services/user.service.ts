@@ -1,6 +1,12 @@
 import databaseService from '~/services/database.service'
 import userType from '~/models/user.schema'
+import { config } from 'dotenv'
 import { ObjectId } from 'mongodb'
+import axios from 'axios'
+
+import { json } from 'stream/consumers'
+import { decodeStringUTF8 } from '~/utils/decodeUTF8'
+config()
 class UserService {
   async getUserByEmail(email: string) {
     try {
@@ -33,6 +39,27 @@ class UserService {
     } catch (err) {
       console.log(err)
     }
+  }
+  async getOauthGoogleToken(code: string) {
+    const body = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    }
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    return data
+  }
+  async getUserByGoogleToken(token: string) {
+    const payload = token.split('.')[1]
+    const decoded = JSON.parse(atob(payload))
+    const { email, name, picture } = decoded
+    return { email, name: decodeStringUTF8(name), profileImg: picture }
   }
 }
 const userService = new UserService()
