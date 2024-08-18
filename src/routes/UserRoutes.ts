@@ -6,19 +6,18 @@ const userRouter = Router();
 
 userRouter.post('/register', authenticationMiddleware.register, AuthenticationControllerInstance.register);
 userRouter.post('/login', authenticationMiddleware.login, AuthenticationControllerInstance.login);
-userRouter.get(
-  '/verify/:verifiedEmailToken',
-  authenticationMiddleware.verifyEmail,
-  AuthenticationControllerInstance.verify
-);
+userRouter.post('/sendVerificationEmail', AuthenticationControllerInstance.sendVerificationEmail);
+userRouter.post('/verify/', authenticationMiddleware.verifyEmail, AuthenticationControllerInstance.verify);
 userRouter.post(
-  '/forgot-password',
+  '/forgotPassword',
   authenticationMiddleware.forgotPassword,
   AuthenticationControllerInstance.forgotPassword
 );
 userRouter.post(
-  '/reset-password',
+  '/resetPassword',
   authenticationMiddleware.resetPassword,
   AuthenticationControllerInstance.resetPassword
 );
+userRouter.post('/googleLogin', AuthenticationControllerInstance.googleLogin);
+
 export default userRouter;

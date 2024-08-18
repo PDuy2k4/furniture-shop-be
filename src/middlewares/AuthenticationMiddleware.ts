@@ -62,7 +62,16 @@ class AuthenticationMiddleware {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
+    // check if email already exists
+    const email = req.body.email;
+    const user = await AuthenticationServiceInstance.findUserByEmail(email);
+    if (user) {
+      if (user.status === UserStatus.PENDING) {
+        return res.status(400).json({ message: ValidationErrorMessage.EMAIL_PENDING });
+      } else {
+        return res.status(400).json({ message: ValidationErrorMessage.EMAIL_ALREADY_EXISTS });
+      }
+    }
     next();
   }
 
@@ -98,11 +107,12 @@ class AuthenticationMiddleware {
 
   async verifyEmail(req: Request, res: Response, next: NextFunction) {
     try {
-      const token = req.params.verifiedEmailToken;
+      const token = req.body.token;
       if (!token) {
         return res.status(400).json({ message: 'Token is required' });
       }
       const decodedToken: any = jwt.verify(token, JWT_SECRET);
+
       const userEmail = decodedToken.email;
       const user = await AuthenticationServiceInstance.findUserByEmail(userEmail);
       if (!user) {

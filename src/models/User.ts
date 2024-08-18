@@ -33,7 +33,9 @@ export default class UserSchema {
     this.name = user.name;
     this.email = user.email;
     this.password = user.password;
-    this.profileImg = user.profileImg || '';
+    this.profileImg =
+      user.profileImg ||
+      'https://static.vecteezy.com/system/resources/thumbnails/013/360/247/small/default-avatar-photo-icon-social-media-profile-sign-symbol-vector.jpg';
     this.isAdmin = user.isAdmin || false;
     this.forgotPasswordToken = user.forgotPasswordToken || '';
     this.verifiedEmailToken = user.verifiedEmailToken || '';

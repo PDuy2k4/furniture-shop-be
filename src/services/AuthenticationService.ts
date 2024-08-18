@@ -12,15 +12,10 @@ const JWT_SECRET: string = process.env.JWT_SECRET || '';
 
 class AuthenticationService {
   async addUser(user: UserType): Promise<UserType | null> {
-    const hashedPassword: string = await bcrypt.hash(user.password, 10);
-    const verifiedEmailToken = jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: '1d' });
-    // Use UserSchema for DB operations
     const newUser: UserSchema = new UserSchema(user);
-    newUser.password = hashedPassword;
-    newUser.verifiedEmailToken = verifiedEmailToken;
+
     const result = await collections.users?.insertOne(newUser);
     if (result) {
-      await this.sendEmail(newUser);
       return newUser as UserType; // Convert UserSchema to UserType
     }
     return null;
@@ -40,6 +35,9 @@ class AuthenticationService {
       return user;
     }
     return null;
+  }
+  async updateRefreshToken(email: string, refreshToken: string): Promise<void> {
+    await collections.users?.updateOne({ email }, { $set: { refreshToken } });
   }
 
   async updateUserStatus(email: string): Promise<void> {
