@@ -16,7 +16,7 @@ const authController = {
     try {
       const validationResult = await authValidate.validateRegister(req, res)
 
-      if (validationResult.status != 200) {
+      if (validationResult.statusCode != 200) {
         return validationResult
       }
 
@@ -90,13 +90,11 @@ const authController = {
     try {
       const validationResult = await authValidate.validateLogin(req, res)
 
-      if (validationResult.status != 200) {
+      if (validationResult.statusCode != 200) {
         return validationResult
       }
 
-      const user = await userSerive.findUserByEmail(req.body.email)
-
-      const validPassword = await bcrypt.compare(req.body.password, user.password)
+      console.log('success')
       return res.status(200).json('Login success')
     } catch (error) {
       return res.status(500).json({ message: 'Internal server error' })

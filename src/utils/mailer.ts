@@ -31,7 +31,7 @@ export const sendVerificationEmail = async (to: string, name: string, accessToke
           <p>Thank you for joining our community. We are delighted to have you with us.</p>
           <p>Please verify your email address by clicking the link below:</p>
           <p style="text-align: center;">
-            Link: ${process.env.APP_BASE_URL}${process.env.VERIFY_EMAIL_ENDPOINT}?token=${accessToken}
+           Link: ${process.env.APP_BASE_URL}${process.env.VERIFY_EMAIL_ENDPOINT}?token=${accessToken}
           </p>
           <p>Enjoy your shopping experience on our website. If you encounter any issues, please feel free to contact us through this email.</p>
           <p>Best regards,</p>

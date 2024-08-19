@@ -37,10 +37,9 @@ const authValidate = {
       }
       console.log('Email already exists')
       return res.status(400).json({ message: 'Email already exists' })
-
     } catch (error) {
       console.log(error)
-      return  res.status(500).json({
+      return res.status(500).json({
         message: 'Internal server error'
       })
     }
@@ -69,6 +68,7 @@ const authValidate = {
         console.log('Please verify your email, remember to check in trash emails')
         return res.status(404).json({ message: 'Please verify your email, remember to check in trash emails' })
       }
+      console.log('success')
 
       return res.status(200)
     } catch (error) {

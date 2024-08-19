@@ -5,12 +5,12 @@ export type userType = {
   _id?: ObjectId
   name: string
   email: string
-  password: string
+  password?: string
   profileImg?: string
   isAdmin: boolean
   forgotPasswordToken?: string
   verifiedEmailToken?: string
-  verify: userVerifyStatus
+  verify?: userVerifyStatus
   refreshToken?: string
   createdAt?: string
   updatedAt?: string
@@ -33,7 +33,7 @@ export default class userSchema {
     this._id = user._id || new ObjectId()
     this.name = user.name
     this.email = user.email
-    this.password = user.password
+    this.password = user.password || ''
     this.profileImg = user.profileImg || ''
     this.isAdmin = user.isAdmin
     this.forgotPasswordToken = user.forgotPasswordToken || ''
