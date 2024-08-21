@@ -2,9 +2,6 @@ import { userType } from '~/models/user'
 import { connectToDataBase } from './database.service'
 import { ObjectId } from 'mongodb'
 import * as mongoDB from 'mongodb'
-import { networkInterfaces } from 'os'
-import { Verify, verify } from 'crypto'
-import { userVerifyStatus } from '~/constants/enum'
 
 const userService = {
   getUserCollection: async function (): Promise<mongoDB.Collection> {
@@ -56,13 +53,13 @@ const userService = {
     }
   },
 
-  updateVerifiedEmailUser: async function (id: string, verifiedEmailToken: string, verifiStatus: userVerifyStatus) {
+  updateVerifiedEmailUser: async function (id: string, verify: object) {
     try {
       const userCollection = await this.getUserCollection()
       console.log('Connected to updateVerifiedEmailUser')
       const result = await userCollection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { verifiedEmailToken: verifiedEmailToken, verify: verifiStatus } }
+        { $set: { ...verify } }
       )
 
       return result

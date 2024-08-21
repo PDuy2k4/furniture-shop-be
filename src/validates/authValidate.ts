@@ -75,6 +75,20 @@ const authValidate = {
       console.log(error)
       return res.status(500).json({ message: 'Internal server error' })
     }
+  },
+
+  validateUpdatePassword: async (req: Request, res: Response): Promise<any> => {
+    try {
+      if(req.body.password === ''){
+        return res.status(404).json({ message: 'Please fill in password' })
+      }
+      if(req.body.password !== req.body.retypePassword){
+        return res.status(404).json({ message: 'Password must be equal to retype password' })        
+      }
+      return res.status(200)
+    } catch (error) {
+      return res.status(500).json({ message: 'Internal server error' })
+    }
   }
 }
 

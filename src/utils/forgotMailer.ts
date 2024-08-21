@@ -1,15 +1,8 @@
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
 
-export const sendVerificationEmail = async (to: string, name: string, accessToken: string) => {
+export const sendForgotPasswordEmail = async (to: string, name: string, accessToken: string) => {
   dotenv.config()
-
-  console.log(process.env.USER_EMAIL)
-  console.log(process.env.USER_EMAIL_PASSWORD)
-  console.log(process.env.APP_BASE_URL)
-  console.log(process.env.VERIFY_EMAIL_ENDPOINT)
-  console.log(to)
-  console.log(name)
 
   try {
     const transporter = nodemailer.createTransport({
@@ -26,14 +19,13 @@ export const sendVerificationEmail = async (to: string, name: string, accessToke
       subject: 'VERIFY YOUR ACCOUNT',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2 style="color: #333;">Welcome to FNshop!</h2>
           <p>Hey <strong>${name}</strong>,</p>
-          <p>Thank you for joining our community. We are delighted to have you with us.</p>
-          <p>Please verify your email address by clicking the link below:</p>
+          <p>If you forgot your password, please verify your email address by clicking the link below:</p>
           <p style="text-align: center;">
-           Link: ${process.env.APP_BASE_URL}${process.env.VERIFY_EMAIL_ENDPOINT}?token=${accessToken}
+           Link: ${process.env.APP_BASE_URL}${process.env.VERIFY_FORGOT_PASSWORD_EMAIL_ENDPOINT}?token=${accessToken}
           </p>
-          <p>Enjoy your shopping experience on our website. If you encounter any issues, please feel free to contact us through this email.</p>
+          <p>Otherwise, if this is not you, please contact us immediately</p>
+          <p>Enjoy your shopping experience on our website</p>
           <p>Best regards,</p>
           <p><strong>FNshop Team</strong></p>
         </div>
